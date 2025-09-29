@@ -12,4 +12,8 @@ A simple to use 2D dynamic lighting library made with SFML 2.6.0!
 * Light quality control
 
 ## How to use
-* To use the light system you need to configure a view. It is the only requirement. Setting it up is super easy, here is a simple example:
+* To use the light system you need to configure a view. It is the only requirement.
+* Make sure you draw the objects that you want to be affected by the light before light.draw(); 
+* Setting it up is super easy, here is a simple example:
+
+<img width="1502" height="536" alt="Screenshot_1" src="https://github.com/user-attachments/assets/75e07f6c-8da4-4b6e-9126-e94186c2d566" />
