@@ -1,4 +1,4 @@
-# Lighter 1.0 💡
+# Lighter v1.0 💡
 A simple to use 2D dynamic lighting library made with SFML 2.6.0!
 
 ## Link 🔗
