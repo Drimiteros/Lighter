@@ -12,7 +12,7 @@ A simple to use 2D dynamic lighting library made with SFML 2.6.0!
 * Light quality control
 
 ## How to use
-* To use the light system you need to configure a view, it is the only requirement. The affect area of the light is the same size as the view size and it's attached to it's position. 
+* To use the light system you need to configure a view, it is the only requirement. The affect area of the light is the same size as the view size and its attached to it's position. 
 * Make sure you draw the objects that you want to be affected by the light before light.draw(); 
 * Setting it up is super easy, here is a simple example that uses all available functions and parameters:
 
