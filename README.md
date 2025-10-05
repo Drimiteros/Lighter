@@ -16,4 +16,4 @@ A simple to use 2D dynamic lighting library made with SFML 2.6.0!
 * Make sure you draw the objects that you want to be affected by the light before light.draw(); 
 * Setting it up is super easy, here is a simple example that uses all available functions and parameters:
 
-<img width="1502" height="510" alt="Screenshot_1" src="https://github.com/user-attachments/assets/6f08a659-07d3-46c1-8b85-bb57f94ce26e" />
+<img width="2317" height="981" alt="Screenshot_1" src="https://github.com/user-attachments/assets/dcb5271c-bd94-44fe-b537-a87954510fc3" />
