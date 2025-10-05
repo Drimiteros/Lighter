@@ -4,14 +4,14 @@ Lighter::Lighter() {
 
 }
 
-void Lighter::setAmbientColor(const Color& color) {
+void Lighter::setAmbientColor(const sf::Color& color) {
     ambient_color = color;
 }
 
-void Lighter::draw(RenderWindow& window, View& view) {
+void Lighter::draw(sf::RenderWindow& window, sf::View& view) {
 
-    Vector2f view_center = view.getCenter();
-    Vector2f view_size = view.getSize();
+    sf::Vector2f view_center = view.getCenter();
+    sf::Vector2f view_size = view.getSize();
 
     float left = view_center.x - view_size.x / 2;
     float top = view_center.y - view_size.y / 2;
@@ -21,24 +21,24 @@ void Lighter::draw(RenderWindow& window, View& view) {
 
     // Draw ambient light
     if (ambient_enabled) {
-        RectangleShape ambient(view_size);
+        sf::RectangleShape ambient(view_size);
         ambient.setPosition(left, top);
         ambient.setFillColor(ambient_color);
         window.draw(ambient);
     }
 
     // Add lights
-    vector<light> light_sources;
+    std::vector<light> light_sources;
     for (const auto& light : lights)
         light_sources.push_back(light);
 
     // Draw rings around the lights
-    VertexArray shadowVerts(Quads, gridX * gridY * 4);
+    sf::VertexArray shadowVerts(sf::Quads, gridX * gridY * 4);
     for (int i = 0; i < gridX; i++) {
         for (int j = 0; j < gridY; j++) {
             float posX = left + i * shadow_size;
             float posY = top + j * shadow_size;
-            Vector2f cellPos(posX + shadow_size / 2.f, posY + shadow_size / 2.f);
+            sf::Vector2f cellPos(posX + shadow_size / 2.f, posY + shadow_size / 2.f);
 
             float brightness = 0.02f;
 
@@ -51,20 +51,20 @@ void Lighter::draw(RenderWindow& window, View& view) {
                 float shadow_radius = light.radius * 1.2f;
                 if (distance < shadow_radius) {
                     float localBrightness = 1.0f - (distance / shadow_radius);
-                    brightness = max(brightness, localBrightness);
+                    brightness = std::max(brightness, localBrightness);
                 }
             }
 
             float alpha = 255 * (1.0f - brightness);
-            alpha = clamp(alpha, 0.f, 255.f);
+            alpha = std::clamp(alpha, 0.f, 255.f);
 
-            Color shadowColor(0, 0, 0, static_cast<Uint8>(alpha));
+            sf::Color shadowColor(0, 0, 0, static_cast<sf::Uint8>(alpha));
 
             int vertexIndex = (i + j * gridX) * 4;
-            shadowVerts[vertexIndex + 0].position = Vector2f(posX, posY);
-            shadowVerts[vertexIndex + 1].position = Vector2f(posX + shadow_size, posY);
-            shadowVerts[vertexIndex + 2].position = Vector2f(posX + shadow_size, posY + shadow_size);
-            shadowVerts[vertexIndex + 3].position = Vector2f(posX, posY + shadow_size);
+            shadowVerts[vertexIndex + 0].position = sf::Vector2f(posX, posY);
+            shadowVerts[vertexIndex + 1].position = sf::Vector2f(posX + shadow_size, posY);
+            shadowVerts[vertexIndex + 2].position = sf::Vector2f(posX + shadow_size, posY + shadow_size);
+            shadowVerts[vertexIndex + 3].position = sf::Vector2f(posX, posY + shadow_size);
 
             for (int k = 0; k < 4; ++k)
                 shadowVerts[vertexIndex + k].color = shadowColor;
@@ -73,12 +73,12 @@ void Lighter::draw(RenderWindow& window, View& view) {
     window.draw(shadowVerts);
 
     // Draw colored lights with additive blending
-    VertexArray lightVerts(Quads, gridX * gridY * 4);
+    sf::VertexArray lightVerts(sf::Quads, gridX * gridY * 4);
     for (int i = 0; i < gridX; i++) {
         for (int j = 0; j < gridY; j++) {
             float posX = left + i * shadow_size;
             float posY = top + j * shadow_size;
-            Vector2f cellPos(posX + shadow_size / 2.f, posY + shadow_size / 2.f);
+            sf::Vector2f cellPos(posX + shadow_size / 2.f, posY + shadow_size / 2.f);
 
             float totalRed = 0.0f, totalGreen = 0.0f, totalBlue = 0.0f;
 
@@ -99,24 +99,24 @@ void Lighter::draw(RenderWindow& window, View& view) {
             }
 
             // Clamp and scale light values
-            totalRed = min(totalRed * 128, 255.0f);
-            totalGreen = min(totalGreen * 128, 255.0f);
-            totalBlue = min(totalBlue * 128, 255.0f);
+            totalRed = std::min(totalRed * 128, 255.0f);
+            totalGreen = std::min(totalGreen * 128, 255.0f);
+            totalBlue = std::min(totalBlue * 128, 255.0f);
 
-            Color lightColor(static_cast<Uint8>(totalRed), static_cast<Uint8>(totalGreen), static_cast<Uint8>(totalBlue), 255);
+            sf::Color lightColor(static_cast<sf::Uint8>(totalRed), static_cast<sf::Uint8>(totalGreen), static_cast<sf::Uint8>(totalBlue), 255);
 
             int vertexIndex = (i + j * gridX) * 4;
-            lightVerts[vertexIndex + 0].position = Vector2f(posX, posY);
-            lightVerts[vertexIndex + 1].position = Vector2f(posX + shadow_size, posY);
-            lightVerts[vertexIndex + 2].position = Vector2f(posX + shadow_size, posY + shadow_size);
-            lightVerts[vertexIndex + 3].position = Vector2f(posX, posY + shadow_size);
+            lightVerts[vertexIndex + 0].position = sf::Vector2f(posX, posY);
+            lightVerts[vertexIndex + 1].position = sf::Vector2f(posX + shadow_size, posY);
+            lightVerts[vertexIndex + 2].position = sf::Vector2f(posX + shadow_size, posY + shadow_size);
+            lightVerts[vertexIndex + 3].position = sf::Vector2f(posX, posY + shadow_size);
 
             for (int k = 0; k < 4; ++k)
                 lightVerts[vertexIndex + k].color = lightColor;
         }
     }
     // Draw lights with additive blending
-    RenderStates lightStates;
-    lightStates.blendMode = BlendAdd;
+    sf::RenderStates lightStates;
+    lightStates.blendMode = sf::BlendAdd;
     window.draw(lightVerts, lightStates);
 }
