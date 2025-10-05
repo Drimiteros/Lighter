@@ -1,7 +1,11 @@
 #include "Lighter.h"
 
 Lighter::Lighter() {
-
+    flare_texture.loadFromFile("src/flare.png");
+    flare.setTexture(flare_texture);
+    flare.setScale(0.2f, 0.2f);
+    flare.setOrigin(flare_texture.getSize().x / 2.f, flare_texture.getSize().y / 2.f);
+    flare.setColor(sf::Color(255, 255, 255, 255));
 }
 
 void Lighter::setAmbientColor(const sf::Color& color) {
@@ -27,10 +31,15 @@ void Lighter::draw(sf::RenderWindow& window, sf::View& view) {
         window.draw(ambient);
     }
 
-    // Add lights
+    // Update lights
     std::vector<light> light_sources;
-    for (const auto& light : lights)
+    for (auto& light : lights) {
         light_sources.push_back(light);
+        if (flare_enabled && light.is_on) {
+            flare.setPosition(light.position);
+            window.draw(flare);
+        }
+    }
 
     // Draw brightness shadows
     sf::VertexArray shadowVerts(sf::Quads, gridX * gridY * 4);
@@ -44,14 +53,16 @@ void Lighter::draw(sf::RenderWindow& window, sf::View& view) {
 
             // Calculate shadow brightness
             for (const auto& light : light_sources) {
-                float dx = light.position.x - cellPos.x;
-                float dy = light.position.y - cellPos.y;
-                float distance = sqrt(dx * dx + dy * dy);
+                if (light.is_on) {
+                    float dx = light.position.x - cellPos.x;
+                    float dy = light.position.y - cellPos.y;
+                    float distance = sqrt(dx * dx + dy * dy);
 
-                float shadow_radius = light.radius * 1.2f;
-                if (distance < shadow_radius) {
-                    float localBrightness = 1.0f - (distance / shadow_radius);
-                    brightness = std::max(brightness, localBrightness);
+                    float shadow_radius = light.radius * 1.2f;
+                    if (distance < shadow_radius) {
+                        float localBrightness = 1.0f - (distance / shadow_radius);
+                        brightness = std::max(brightness, localBrightness);
+                    }
                 }
             }
 
@@ -84,17 +95,19 @@ void Lighter::draw(sf::RenderWindow& window, sf::View& view) {
 
             // Add light contributions
             for (const auto& light : light_sources) {
-                float dx = light.position.x - cellPos.x;
-                float dy = light.position.y - cellPos.y;
-                float distance = sqrt(dx * dx + dy * dy);
+                if (light.is_on) {
+                    float dx = light.position.x - cellPos.x;
+                    float dy = light.position.y - cellPos.y;
+                    float distance = sqrt(dx * dx + dy * dy);
 
-                if (distance < light.radius) {
-                    float intensity = 1.0f - (distance / light.radius);
-                    intensity = intensity * intensity;
+                    if (distance < light.radius) {
+                        float intensity = 1.0f - (distance / light.radius);
+                        intensity = intensity * intensity;
 
-                    totalRed += (light.color.r / 255.0f) * intensity;
-                    totalGreen += (light.color.g / 255.0f) * intensity;
-                    totalBlue += (light.color.b / 255.0f) * intensity;
+                        totalRed += (light.color.r / 255.0f) * intensity;
+                        totalGreen += (light.color.g / 255.0f) * intensity;
+                        totalBlue += (light.color.b / 255.0f) * intensity;
+                    }
                 }
             }
 
@@ -115,6 +128,7 @@ void Lighter::draw(sf::RenderWindow& window, sf::View& view) {
                 lightVerts[vertexIndex + k].color = lightColor;
         }
     }
+
     // Draw lights with additive blending
     sf::RenderStates lightStates;
     lightStates.blendMode = sf::BlendAdd;
