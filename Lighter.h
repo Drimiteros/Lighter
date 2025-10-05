@@ -10,6 +10,7 @@ private:
 public:
     int shadow_size = 10;
     bool ambient_enabled = true;
+    float min_brightness = 0.0f;
     sf::Color ambient_color;
     struct light {
         sf::Vector2f position;

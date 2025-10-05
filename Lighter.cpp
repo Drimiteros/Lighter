@@ -32,7 +32,7 @@ void Lighter::draw(sf::RenderWindow& window, sf::View& view) {
     for (const auto& light : lights)
         light_sources.push_back(light);
 
-    // Draw rings around the lights
+    // Draw brightness shadows
     sf::VertexArray shadowVerts(sf::Quads, gridX * gridY * 4);
     for (int i = 0; i < gridX; i++) {
         for (int j = 0; j < gridY; j++) {
@@ -40,7 +40,7 @@ void Lighter::draw(sf::RenderWindow& window, sf::View& view) {
             float posY = top + j * shadow_size;
             sf::Vector2f cellPos(posX + shadow_size / 2.f, posY + shadow_size / 2.f);
 
-            float brightness = 0.02f;
+            float brightness = min_brightness;
 
             // Calculate shadow brightness
             for (const auto& light : light_sources) {
